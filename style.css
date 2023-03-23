@@ -102,3 +102,19 @@ body {
   box-shadow: 0px 5px 5px rgb(175, 193, 76, 0.2);
   transform: scale(1.05);
 }
+.cell.hightlight {
+  transition: all 0.1s ease;
+  background-color: #39b051;
+  box-shadow: 0px 5px 5px rgb(175, 193, 76, 0.2);
+  /* transform: scale(1.05); */
+}
+
+.figure {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  width: 25px;
+  height: 25px;
+  background-color: #979797;
+}
