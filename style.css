@@ -104,8 +104,9 @@ body {
 }
 .cell.hightlight {
   transition: all 0.1s ease;
-  background-color: #39b051;
+  background-color: #39b051cb;
   box-shadow: 0px 5px 5px rgb(175, 193, 76, 0.2);
+  scale: 0.97;
   /* transform: scale(1.05); */
 }
 

@@ -62,6 +62,25 @@ function calcKnightMoves(knight, horse) {
       return true;
   });
 }
+
+function calcPawnMoves(pawn) {
+  if (defaultArr[pawn[0]][pawn[1]][0] === 1) {
+    if (pawn[0] == 6) {
+      return [
+        [pawn[0] - 1, pawn[1]],
+        [pawn[0] - 2, pawn[1]],
+      ];
+    }
+    return [[pawn[0] - 1, pawn[1]]];
+  }
+  if (pawn[0] == 1) {
+    return [
+      [pawn[0] + 1, pawn[1]],
+      [pawn[0] + 2, pawn[1]],
+    ];
+  }
+  return [[pawn[0] + 1, pawn[1]]];
+}
 const twoDamnArr = (arr) =>
   arr.map((_, i) => {
     if (i > 7) return;
@@ -127,7 +146,39 @@ function run(e) {
     const availableMoves = moves.filter((move) => {
       if (defaultArr[move[0]][move[1]] == " ") return true;
     });
+
     // rendering
+    drawMoves(availableMoves, defaultArr);
+  }
+  if (figure[1] === "♟") {
+    const moves = calcPawnMoves(coords);
+    const availableMoves = moves.filter((move) => {
+      if (defaultArr[move[0]][move[1]] == " ") return true;
+    });
+    drawMoves(availableMoves, defaultArr);
+  }
+  if (figure[1] === "♛") {
+    const moves = calcQueenMoves(coords, defaultArr);
+    const availableMoves = moves.filter((move) => {
+      if (defaultArr[move[0]][move[1]] == " ") return true;
+    });
+    console.log(moves);
+    drawMoves(availableMoves, defaultArr);
+  }
+  if (figure[1] === "♜") {
+    const moves = calcRookMoves(coords, defaultArr);
+    const availableMoves = moves.filter((move) => {
+      if (defaultArr[move[0]][move[1]] == " ") return true;
+    });
+    console.log(moves);
+    drawMoves(availableMoves, defaultArr);
+  }
+  if (figure[1] === "♝") {
+    const moves = calcBishopMoves(coords, defaultArr);
+    const availableMoves = moves.filter((move) => {
+      if (defaultArr[move[0]][move[1]] == " ") return true;
+    });
+    console.log(moves);
     drawMoves(availableMoves, defaultArr);
   }
 }
@@ -135,3 +186,65 @@ function run(e) {
 render(defaultArr);
 
 board.addEventListener("click", run);
+
+function calcHor(figure, board) {
+  const arr = [];
+
+  for (let i = figure[0] + 1; i < 8; i++) {
+    if (board[i][figure[1]] != " ") break;
+    arr.push([i, figure[1]]);
+  }
+
+  // checking vertically backwards
+  for (let d = figure[0] - 1; d >= 0; d--) {
+    if (board[d][figure[1]] != " ") break;
+    arr.push([d, figure[1]]);
+  }
+
+  // checking to right
+  for (let r = figure[1] + 1; r < 8; r++) {
+    if (board[figure[0]][r] != " ") break;
+    arr.push([figure[0], r]);
+  }
+  for (let r = figure[1] - 1; r >= 0; r--) {
+    if (board[figure[0]][r] != " ") break;
+    arr.push([figure[0], r]);
+  }
+  return arr;
+}
+function calcDiag(figure, board) {
+  const arr = [];
+  for (let dr = figure[0] + 1; dr < 8; dr++) {
+    if (board[dr][figure[1] + dr - figure[0]] != " ") break;
+    arr.push([dr, figure[1] + dr - figure[0]]);
+  }
+  // from right-bottom to right-top
+  for (let dl = figure[0] - 1; dl >= 0; dl--) {
+    if (figure[1] - (figure[0] - dl) < 0) break;
+    if (board[dl][figure[1] - (figure[0] - dl)] != " ") break;
+    arr.push([dl, figure[1] - (figure[0] - dl)]);
+  }
+
+  // From right-top to left-bottom
+  for (let dlb = figure[0] + 1; dlb < 8; dlb++) {
+    if (figure[1] - (dlb - figure[0]) < 0) break;
+    if (board[dlb][figure[1] - (dlb - figure[0])] != " ") break;
+    arr.push([dlb, figure[1] - (dlb - figure[0])]);
+  }
+  // From left-bottom to right-top
+
+  for (let dlt = figure[0] - 1; dlt >= 0; dlt--) {
+    if (board[dlt][figure[1] + figure[0] - dlt] != " ") break;
+    arr.push([dlt, figure[1] + figure[0] - dlt]);
+  }
+  return arr;
+}
+function calcRookMoves(rook, board) {
+  return calcHor(rook, board);
+}
+function calcBishopMoves(bishop, board) {
+  return calcDiag(bishop, board);
+}
+function calcQueenMoves(queen, board) {
+  return [...calcDiag(queen, board), ...calcHor(queen, board)];
+}
