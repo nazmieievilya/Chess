@@ -10,6 +10,8 @@ body {
 
 .container {
   width: 100%;
+  flex-direction: column;
+  align-items: center;
   display: flex;
   justify-content: center;
 }
@@ -95,7 +97,18 @@ body {
 .white {
   color: white;
 }
-
+.moves {
+  margin-top: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 7px;
+  font-size: 20px;
+  width: 30px;
+  height: 30px;
+  background-color: #5d5d5d;
+  border: 2px solid rgb(56, 56, 56);
+}
 .cell:hover {
   transition: all 0.1s ease;
   background-color: #aab54e;

@@ -1,5 +1,6 @@
 const cells = document.querySelectorAll(".cell");
 const board = document.querySelector(".board");
+const move = document.querySelector(".moves");
 let defaultArr = [
   [
     [0, "♜"],
@@ -46,7 +47,7 @@ let defaultArr = [
     [1, "♜"],
   ],
 ];
-
+let isWhite = true;
 function calcKnightMoves(knight, horse) {
   return [
     [knight[0] + 1, knight[1] + 2],
@@ -61,6 +62,11 @@ function calcKnightMoves(knight, horse) {
     if (coord[0] < 8 && coord[0] >= 0 && coord[1] < 8 && coord[1] >= 0)
       return true;
   });
+}
+
+function updateWhoGoes(isWhite) {
+  if (isWhite) return move.classList.add("white");
+  move.classList.remove("white");
 }
 
 function calcPawnMoves(pawn) {
@@ -126,21 +132,25 @@ function moveFigure(figure, arr, coordsToMove) {
   clear();
   render(newArr);
   cells.forEach((cell) => cell.classList.remove("hightlight"));
+  isWhite = !isWhite;
+  updateWhoGoes(isWhite);
 }
 let selectedFig = "";
 function run(e) {
-  if (e.target.classList.contains("hightlight"))
+  if (e.target.classList.contains("hightlight")) {
     return moveFigure(
       selectedFig,
       defaultArr,
       e.target.dataset.coords.split(",")
     );
+  }
   cells.forEach((cell) => cell.classList.remove("hightlight"));
   const element = e.target.closest(".cell").children[0];
   if (!element) return;
   const coords = element.dataset.coords.split(",").map((el) => +el);
   const figure = [element.classList[0] == "white" ? 0 : 1, element.textContent];
   selectedFig = coords;
+  if ((figure[0] === 1 && isWhite) || (figure[0] === 0 && !isWhite)) return;
   if (figure[1] === "♞") {
     const moves = calcKnightMoves(coords);
     const availableMoves = moves.filter((move) => {
@@ -248,3 +258,4 @@ function calcBishopMoves(bishop, board) {
 function calcQueenMoves(queen, board) {
   return [...calcDiag(queen, board), ...calcHor(queen, board)];
 }
+updateWhoGoes(isWhite);
