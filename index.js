@@ -112,6 +112,11 @@ function render(arr) {
 function drawMoves(moves, arr) {
   const twoDemArr = twoDamnArr(arr);
   moves.forEach((move) => {
+    if (twoDemArr[move[0]][move[1]].textContent) {
+      twoDemArr[move[0]][move[1]].classList.add("kill");
+      twoDemArr[move[0]][move[1]].dataset.coords = [move[0], move[1]].join(",");
+      return;
+    }
     twoDemArr[move[0]][move[1]].classList.add("hightlight");
     twoDemArr[move[0]][move[1]].dataset.coords = [move[0], move[1]].join(",");
   });
@@ -135,8 +140,29 @@ function moveFigure(figure, arr, coordsToMove) {
   isWhite = !isWhite;
   updateWhoGoes(isWhite);
 }
+function killFigure(figure, arr, coordsToMove) {
+  console.log(coordsToMove);
+  console.log(figure);
+  const newArr = JSON.parse(JSON.stringify(arr));
+  newArr[+coordsToMove[0]][+coordsToMove[1]] = newArr[figure[0]][figure[1]];
+  newArr[figure[0]][figure[1]] = " ";
+  defaultArr = newArr;
+  clear();
+  render(newArr);
+  cells.forEach((cell) => cell.classList.remove("hightlight"));
+  cells.forEach((cell) => cell.classList.remove("kill"));
+  isWhite = !isWhite;
+  updateWhoGoes(isWhite);
+}
 let selectedFig = "";
 function run(e) {
+  if (e.target.classList.contains("kill")) {
+    return killFigure(
+      selectedFig,
+      defaultArr,
+      e.target.dataset.coords.split(",")
+    );
+  }
   if (e.target.classList.contains("hightlight")) {
     return moveFigure(
       selectedFig,
@@ -144,6 +170,7 @@ function run(e) {
       e.target.dataset.coords.split(",")
     );
   }
+
   cells.forEach((cell) => cell.classList.remove("hightlight"));
   const element = e.target.closest(".cell").children[0];
   if (!element) return;
@@ -154,7 +181,11 @@ function run(e) {
   if (figure[1] === "♞") {
     const moves = calcKnightMoves(coords);
     const availableMoves = moves.filter((move) => {
-      if (defaultArr[move[0]][move[1]] == " ") return true;
+      if (
+        defaultArr[move[0]][move[1]] == " " ||
+        defaultArr[move[0]][move[1]][0] !== figure[0]
+      )
+        return true;
     });
 
     // rendering
@@ -163,7 +194,11 @@ function run(e) {
   if (figure[1] === "♟") {
     const moves = calcPawnMoves(coords);
     const availableMoves = moves.filter((move) => {
-      if (defaultArr[move[0]][move[1]] == " ") return true;
+      if (
+        defaultArr[move[0]][move[1]] == " " ||
+        defaultArr[move[0]][move[1]][0] !== figure[0]
+      )
+        return true;
     });
     drawMoves(availableMoves, defaultArr);
   }
