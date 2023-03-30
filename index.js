@@ -75,7 +75,10 @@ function calcPawnMoves(pawn, arr, color) {
       const allMoves = [];
       if (arr[pawn[0] - 1][pawn[1]] === " ")
         allMoves.push([pawn[0] - 1, pawn[1]]);
-      if (arr[pawn[0] - 2][pawn[1]] === " ")
+      if (
+        arr[pawn[0] - 2][pawn[1]] === " " &&
+        arr[pawn[0] - 1][pawn[1]] === " "
+      )
         allMoves.push([pawn[0] - 2, pawn[1]]);
       if (
         arr[pawn[0] - 1][pawn[1] + 1]?.[0] !== color &&
@@ -108,7 +111,8 @@ function calcPawnMoves(pawn, arr, color) {
     const allMoves = [];
     if (arr[pawn[0] + 1][pawn[1]] === " ")
       allMoves.push([pawn[0] + 1, pawn[1]]);
-    if (arr[pawn[0] + 2][pawn[1]]) allMoves.push([pawn[0] + 2, pawn[1]]);
+    if (arr[pawn[0] + 2][pawn[1]] === " " && arr[pawn[0] + 1][pawn[1]] === " ")
+      allMoves.push([pawn[0] + 2, pawn[1]]);
     if (
       arr[pawn[0] + 1][pawn[1] + 1]?.[0] !== color &&
       arr[pawn[0] + 1][pawn[1] + 1] != " "
@@ -262,25 +266,25 @@ function run(e) {
   }
   if (figure[1] === "♜") {
     const moves = calcRookMoves(coords, defaultArr, figure[0]);
-    const availableMoves = moves.filter((move) => {
-      if (
-        defaultArr[move[0]][move[1]] == " " ||
-        defaultArr[move[0]][move[1]][0] !== figure[0]
-      )
-        return true;
-    });
+    // const availableMoves = moves.filter((move) => {
+    //   if (
+    //     defaultArr[move[0]][move[1]] == " " ||
+    //     defaultArr[move[0]][move[1]][0] !== figure[0]
+    //   )
+    //     return true;
+    // });
     console.log(moves);
     drawMoves(moves, defaultArr);
   }
   if (figure[1] === "♝") {
     const moves = calcBishopMoves(coords, defaultArr, figure[0]);
-    const availableMoves = moves.filter((move) => {
-      if (
-        defaultArr[move[0]][move[1]] == " " ||
-        defaultArr[move[0]][move[1]][0] !== figure[0]
-      )
-        return true;
-    });
+    // const availableMoves = moves.filter((move) => {
+    //   if (
+    //     defaultArr[move[0]][move[1]] == " " ||
+    //     defaultArr[move[0]][move[1]][0] !== figure[0]
+    //   )
+    //     return true;
+    // });
     console.log(moves);
     drawMoves(moves, defaultArr);
   }
