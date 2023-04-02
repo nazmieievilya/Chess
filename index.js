@@ -5,6 +5,7 @@ import {
   calcQueenMoves,
   calcPawnMoves,
   calcKnightMoves,
+  calcKingMoves,
 } from "./modules/movesOfFigures.js";
 import { moveFigure, killFigure } from "./modules/module.js";
 import { updateWhoGoes, render, drawMoves, clear } from "./modules/view.js";
@@ -16,7 +17,8 @@ let isWhite = true;
 
 let selectedFig = "";
 function run(e) {
-  if (e.target.classList.contains("kill")) {
+  const cell = e.target.closest(".cell");
+  if (cell.classList.contains("kill")) {
     isWhite = !isWhite;
     boardState = killFigure(
       selectedFig,
@@ -32,7 +34,7 @@ function run(e) {
     updateWhoGoes(isWhite, move);
     return;
   }
-  if (e.target.classList.contains("hightlight")) {
+  if (cell.classList.contains("hightlight")) {
     isWhite = !isWhite;
     boardState = moveFigure(
       selectedFig,
@@ -50,7 +52,7 @@ function run(e) {
 
   cells.forEach((cell) => cell.classList.remove("hightlight"));
   cells.forEach((cell) => cell.classList.remove("kill"));
-  const element = e.target.closest(".cell").children[0];
+  const element = cell.children[0];
   if (!element) return;
   const coords = element.dataset.coords.split(",").map((el) => +el);
   const figure = [element.classList[0] == "white" ? 0 : 1, element.textContent];
@@ -83,8 +85,23 @@ function run(e) {
     const moves = calcBishopMoves(coords, boardState, figure[0]);
     drawMoves(moves, boardState, cells);
   }
+  if (figure[1] === "♔") {
+    const moves = calcKingMoves(coords, boardState, figure[0]);
+    console.log(moves);
+    const availableMoves = moves.filter((move) => {
+      if (
+        move[0] >= 0 &&
+        move[0] <= 7 &&
+        move[1] >= 0 &&
+        move[1] <= 7 &&
+        boardState?.[move[0]]?.[move[1]]?.[1] !== "♔"
+      )
+        return true;
+    });
+    drawMoves(availableMoves, boardState, cells);
+  }
 }
-
+// TODO: write function that will return "true" if between kings are at least 2 units difference in coords
 render(boardState, cells);
 board.addEventListener("click", run);
 updateWhoGoes(isWhite, move);

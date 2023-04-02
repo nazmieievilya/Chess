@@ -175,3 +175,51 @@ export function calcKnightMoves(knight, horse) {
       return true;
   });
 }
+export function calcKingMoves(king, arr, color) {
+  const checkRange = (a, b) =>
+    a >= 0 && a <= 8 && b >= 0 && b <= 8 ? true : false;
+  console.log(king);
+  const allMoves = [];
+  // console.log(king, arr, color);
+  if (
+    arr?.[king[0] + 1]?.[king[1]]?.[0] !== color ||
+    arr?.[king[0] + 1]?.[king[1]] === " "
+  )
+    allMoves.push([king[0] + 1, king[1]]);
+  if (
+    arr?.[king[0] - 1]?.[king[1]]?.[0] !== color ||
+    arr?.[king[0] - 1]?.[king[1]] === " "
+  )
+    allMoves.push([king[0] - 1, king[1]]);
+  if (
+    arr?.[king[0]]?.[king[1] + 1]?.[0] !== color ||
+    arr?.[king[0]]?.[king[1] + 1] === " "
+  )
+    allMoves.push([king[0], king[1] + 1]);
+  if (
+    arr?.[king[0]]?.[king[1] - 1]?.[0] !== color ||
+    arr?.[king[0]]?.[king[1] - 1] === " "
+  )
+    allMoves.push([king[0], king[1] - 1]);
+  if (
+    arr?.[king[0] - 1]?.[king[1] - 1]?.[0] !== color ||
+    arr?.[king[0] - 1]?.[king[1] - 1] === " "
+  )
+    allMoves.push([king[0] - 1, king[1] - 1]);
+  if (
+    arr?.[king[0] + 1]?.[king[1] - 1]?.[0] !== color ||
+    arr?.[king[0] + 1]?.[king[1] - 1] === " "
+  )
+    allMoves.push([king[0] + 1, king[1] - 1]);
+  if (
+    arr?.[king[0] + 1]?.[king[1] + 1]?.[0] !== color ||
+    arr?.[king[0] + 1]?.[king[1] + 1] === " "
+  )
+    allMoves.push([king[0] + 1, king[1] + 1]);
+  if (
+    arr?.[king[0] - 1]?.[king[1] + 1]?.[0] !== color ||
+    arr?.[king[0] - 1]?.[king[1] + 1] === " "
+  )
+    allMoves.push([king[0] - 1, king[1] + 1]);
+  return allMoves;
+}
