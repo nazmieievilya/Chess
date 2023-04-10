@@ -1,0 +1,876 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: sans-serif;
+      }
+      body {
+        background-color: #4e5256;
+      }
+
+      .container {
+        width: 100%;
+        flex-direction: column;
+        align-items: center;
+        display: flex;
+        justify-content: center;
+      }
+      .board {
+        display: grid;
+        border-radius: 3px;
+        overflow: hidden;
+        background-color: #007f78;
+        border: 2px solid rgb(23, 23, 23);
+        justify-content: center;
+        grid-template-columns: repeat(1, 1fr);
+      }
+      .cell {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        cursor: pointer;
+      }
+      .row {
+        display: grid;
+        justify-items: center;
+        grid-template-columns: repeat(8, 1fr);
+      }
+      .even-cell:nth-child(even) {
+        background-color: rgb(65, 65, 65);
+      }
+
+      .odd-cell:nth-child(odd) {
+        background-color: rgb(65, 65, 65);
+      }
+
+      .coords_container {
+        margin-top: 20px;
+        background-color: #fffeff;
+        position: relative;
+        padding: 0 12px;
+        /* border-radius: 5px; */
+
+        background-color: #2d2d2d;
+        border: 4px solid rgb(23, 23, 23);
+      }
+      /* IF WHITE */
+      .if_white {
+
+        <% if (!isDark) { %>
+          transform: rotate(180deg);
+         <% } else { %>
+          transform: none;
+        <% } %>
+
+      }
+      .coords {
+        display: flex;
+        justify-content: center;
+      }
+      .coord {
+        width: 12px;
+        font-size: 12px;
+      }
+      .coords p {
+        font-size: 12px;
+        display: inline-block;
+        width: 40px;
+        color: white;
+        transform: rotate(180deg);
+        text-align: center;
+      }
+      .absolute_coords {
+        position: absolute;
+        display: flex;
+
+        flex-direction: column;
+      }
+      .num_coords {
+        display: flex;
+        align-items: center;
+        height: 40px;
+        font-size: 12px;
+        color: white;
+      }
+      .absolute_coords:nth-child(2) {
+        right: 3px;
+      }
+      .absolute_coords:nth-child(1) {
+        left: 3px;
+      }
+
+      .black {
+        color: black;
+      }
+
+      .white {
+        color: white;
+      }
+      .moves {
+        margin-top: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        font-size: 20px;
+        width: 30px;
+        height: 30px;
+        background-color: #5d5d5d;
+        border: 2px solid rgb(56, 56, 56);
+      }
+      .cell:hover {
+        transition: all 0.1s ease;
+        background-color: #aab54e;
+        box-shadow: 0px 5px 5px rgb(175, 193, 76, 0.2);
+        transform: scale(1.05);
+      }
+      .cell.hightlight {
+        transition: all 0.1s ease;
+        background-color: #39b051cb;
+        box-shadow: 0px 5px 5px rgb(175, 193, 76, 0.2);
+        scale: 0.97;
+        /* transform: scale(1.05); */
+      }
+      .cell.kill {
+        transition: all 0.1s ease;
+        background-color: #e75a50cb;
+        box-shadow: 0px 5px 5px rgb(175, 193, 76, 0.2);
+        scale: 0.97;
+        /* transform: scale(1.05); */
+      }
+      .figure {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 7px;
+        width: 25px;
+        height: 25px;
+        background-color: #979797;
+      }
+
+      .generate_link {
+
+        flex-direction: column;
+        align-items: center;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        z-index: 100;
+        justify-content: center;
+
+        background-color: #5d5d5d;
+      <% if (isDark) { %>
+        display: none
+      <% } else { %>
+        display: flex;
+      <% } %>
+        /* display: none; */
+      }
+      .generate_link button {
+        margin-bottom: 15px;
+        width: 200px;
+        border: none;
+        border-radius: 2px;
+        padding: 2px 12px;
+      }
+      .generate_link button:hover {
+        background-color: #007f78;
+        color: white;
+      }
+      .generate_link input {
+        border-radius: 2px;
+        width: 200px;
+        border: none;
+        padding: 2px 12px;
+      }
+      #send {
+        margin-top: 40px;
+        font-size: 12px;
+        display: none;
+        transform: all 0.2s ease;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="generate_link">
+      <button>Generate link</button>
+      <input id="link" placeholder="input link" type="text" />
+      <button id="send">I've already sent link to friend!</button>
+    </div>
+    <div class="container">
+      <p class="moves">♔</p>
+      <div class="coords_container if_white">
+        <div class="coords if_white">
+          <p>A</p>
+          <p>B</p>
+          <p>C</p>
+          <p>D</p>
+          <p>E</p>
+          <p>F</p>
+          <p>G</p>
+          <p>H</p>
+        </div>
+        <div class="board">
+          <div class="absolute_coords">
+            <p class="num_coords if_white">1</p>
+            <p class="num_coords if_white">2</p>
+            <p class="num_coords if_white">3</p>
+            <p class="num_coords if_white">4</p>
+            <p class="num_coords if_white">5</p>
+            <p class="num_coords if_white">6</p>
+            <p class="num_coords if_white">7</p>
+            <p class="num_coords if_white">8</p>
+          </div>
+          <div class="absolute_coords">
+            <p class="num_coords if_white">1</p>
+            <p class="num_coords if_white">2</p>
+            <p class="num_coords if_white">3</p>
+            <p class="num_coords if_white">4</p>
+            <p class="num_coords if_white">5</p>
+            <p class="num_coords if_white">6</p>
+            <p class="num_coords if_white">7</p>
+            <p class="num_coords if_white">8</p>
+          </div>
+
+          <div class="row">
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+          </div>
+          <div class="row">
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+          </div>
+          <div class="row">
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+          </div>
+          <div class="row">
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+          </div>
+          <div class="row">
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+          </div>
+          <div class="row">
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+          </div>
+          <div class="row">
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+            <div class="cell odd-cell"></div>
+          </div>
+          <div class="row">
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+            <div class="cell even-cell"></div>
+          </div>
+        </div>
+        <div class="coords">
+          <p>A</p>
+          <p>B</p>
+          <p>C</p>
+          <p>D</p>
+          <p>E</p>
+          <p>F</p>
+          <p>G</p>
+          <p>H</p>
+        </div>
+      </div>
+    </div>
+  </body>
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+  <script>
+
+    <% if (isDark) { %>
+      let sessionId = <%= sessId %>
+    <% } else { %>
+      let sessionId
+    <% } %>
+    const site = "127.0.0.1:3000/";
+    const initialState = [
+      [
+        [0, "♜"],
+        [0, "♞"],
+        [0, "♝"],
+        [0, "♛"],
+        [0, "♔"],
+        [0, "♝"],
+        [0, "♞"],
+        [0, "♜"],
+      ],
+      [
+        [0, "♙"],
+        [0, "♙"],
+        [0, "♙"],
+        [0, "♙"],
+        [0, "♙"],
+        [0, "♙"],
+        [0, "♙"],
+        [0, "♙"],
+      ],
+      [" ", " ", " ", " ", " ", " ", " ", " "],
+      [" ", " ", " ", " ", " ", " ", " ", " "],
+      [" ", " ", " ", " ", " ", " ", " ", " "],
+      [" ", " ", " ", " ", " ", " ", " ", " "],
+      [
+        [1, "♙"],
+        [1, "♙"],
+        [1, "♙"],
+        [1, "♙"],
+        [1, "♙"],
+        [1, "♙"],
+        [1, "♙"],
+        [1, "♙"],
+      ],
+      [
+        [1, "♜"],
+        [1, "♞"],
+        [1, "♝"],
+        [1, "♛"],
+        [1, "♔"],
+        [1, "♝"],
+        [1, "♞"],
+        [1, "♜"],
+      ],
+    ];
+
+    function moveFigure(
+      figure,
+      arr,
+      coordsToMove,
+      clear,
+      render,
+      updateWhoGoes,
+      cells,
+      move
+    ) {
+      const newArr = JSON.parse(JSON.stringify(arr));
+      newArr[+coordsToMove[0]][+coordsToMove[1]] = newArr[figure[0]][figure[1]];
+      newArr[figure[0]][figure[1]] = " ";
+      newArr;
+      clear(cells);
+      render(newArr, cells);
+      cells.forEach((cell) => cell.classList.remove("hightlight"));
+      cells.forEach((cell) => cell.classList.remove("kill"));
+
+      return newArr;
+    }
+    function killFigure(
+      figure,
+      arr,
+      coordsToMove,
+      clear,
+      render,
+      updateWhoGoes,
+      cells,
+      move
+    ) {
+      const newArr = JSON.parse(JSON.stringify(arr));
+      newArr[+coordsToMove[0]][+coordsToMove[1]] = newArr[figure[0]][figure[1]];
+      newArr[figure[0]][figure[1]] = " ";
+
+      clear(cells);
+      render(newArr, cells);
+      cells.forEach((cell) => cell.classList.remove("hightlight"));
+      cells.forEach((cell) => cell.classList.remove("kill"));
+
+      return newArr;
+    }
+
+    function updateWhoGoes(isWhite, move) {
+      if (isWhite) return move.classList?.add("white");
+      move.classList?.remove("white");
+    }
+
+    const twoDamnArr = (arr, cells) =>
+      arr.map((_, i) => {
+        if (i > 7) return;
+        return [...cells].slice(i * 8, i * 8 + 8);
+      });
+    function render(arr, cells) {
+      const twoDemArr = twoDamnArr(arr, cells);
+      twoDemArr.forEach((row, x) => {
+        row.forEach((cell, y) => {
+          if (arr[x][y] == " ") return;
+          const color = arr[x][y][0];
+          const figure = arr[x][y][1];
+          cell.insertAdjacentHTML(
+            "afterbegin",
+            `<p data-coords='${x},${y}' class='${
+              color > 0 ? "balck" : "white"
+            } figure if_white'>${figure}</p>`
+          );
+        });
+      });
+    }
+
+    function drawMoves(moves, arr, cells) {
+      const twoDemArr = twoDamnArr(arr, cells);
+      moves.forEach((move) => {
+        if (twoDemArr[move[0]][move[1]]?.textContent) {
+          twoDemArr[move[0]][move[1]].classList.add("kill");
+          twoDemArr[move[0]][move[1]].dataset.coords = [move[0], move[1]].join(
+            ","
+          );
+          return;
+        }
+        twoDemArr[move[0]][move[1]]?.classList.add("hightlight");
+        const dataset = twoDemArr[move[0]][move[1]]?.dataset;
+        dataset ? (dataset.coords = [move[0], move[1]].join(",")) : null;
+      });
+    }
+    function clear(cells) {
+      cells.forEach((cell) => {
+        cell.textContent = "";
+      });
+    }
+
+    function calcHor(figure, board, color) {
+      const arr = [];
+
+      for (let i = figure[0] + 1; i < 8; i++) {
+        if (board[i][figure[1]]?.[0] === color) break;
+        arr.push([i, figure[1]]);
+        if (board[i][figure[1]]?.[0] !== color && board[i][figure[1]] !== " ")
+          break;
+      }
+
+      // checking vertically backwards
+      for (let d = figure[0] - 1; d >= 0; d--) {
+        if (board[d][figure[1]]?.[0] === color) break;
+        arr.push([d, figure[1]]);
+        if (board[d][figure[1]]?.[0] !== color && board[d][figure[1]] !== " ")
+          break;
+      }
+
+      // checking to right
+      for (let r = figure[1] + 1; r < 8; r++) {
+        if (board[figure[0]][r]?.[0] === color) break;
+        arr.push([figure[0], r]);
+        if (board[figure[0]][r]?.[0] !== color && board[figure[0]][r] !== " ")
+          break;
+      }
+      for (let r = figure[1] - 1; r >= 0; r--) {
+        if (board[figure[0]][r]?.[0] === color) break;
+        arr.push([figure[0], r]);
+        if (board[figure[0]][r]?.[0] !== color && board[figure[0]][r] !== " ")
+          break;
+      }
+      return arr;
+    }
+
+    function calcDiag(figure, board, color) {
+      const arr = [];
+      for (let dr = figure[0] + 1; dr < 8; dr++) {
+        if (board[dr][figure[1] + dr - figure[0]]?.[0] === color) break;
+        arr.push([dr, figure[1] + dr - figure[0]]);
+        if (
+          board[dr][figure[1] + dr - figure[0]]?.[0] !== color &&
+          board[dr][figure[1] + dr - figure[0]] !== " "
+        )
+          break;
+      }
+      // from right-bottom to right-top
+      for (let dl = figure[0] - 1; dl >= 0; dl--) {
+        if (figure[1] - (figure[0] - dl) < 0) break;
+        if (board[dl][figure[1] - (figure[0] - dl)]?.[0] === color) break;
+        arr.push([dl, figure[1] - (figure[0] - dl)]);
+        if (
+          board[dl][figure[1] - (figure[0] - dl)]?.[0] !== color &&
+          board[dl][figure[1] - (figure[0] - dl)] !== " "
+        )
+          break;
+      }
+
+      // From right-top to left-bottom
+      for (let dlb = figure[0] + 1; dlb < 8; dlb++) {
+        if (figure[1] - (dlb - figure[0]) < 0) break;
+        if (board[dlb][figure[1] - (dlb - figure[0])]?.[0] === color) break;
+        arr.push([dlb, figure[1] - (dlb - figure[0])]);
+        if (
+          board[dlb][figure[1] - (dlb - figure[0])]?.[0] !== color &&
+          board[dlb][figure[1] - (dlb - figure[0])] !== " "
+        )
+          break;
+      }
+      // From left-bottom to right-top
+
+      for (let dlt = figure[0] - 1; dlt >= 0; dlt--) {
+        if (board[dlt][figure[1] + figure[0] - dlt]?.[0] === color) break;
+        arr.push([dlt, figure[1] + figure[0] - dlt]);
+        if (
+          board[dlt][figure[1] + figure[0] - dlt]?.[0] !== color &&
+          board[dlt][figure[1] + figure[0] - dlt] !== " "
+        )
+          break;
+      }
+      return arr;
+    }
+    function calcRookMoves(rook, board, color) {
+      return calcHor(rook, board, color);
+    }
+    function calcBishopMoves(bishop, board, color) {
+      return calcDiag(bishop, board, color);
+    }
+    function calcQueenMoves(queen, board, color) {
+      return [
+        ...calcDiag(queen, board, color),
+        ...calcHor(queen, board, color),
+      ];
+    }
+
+    function calcPawnMoves(pawn, arr, color) {
+      if (arr[pawn[0]][pawn[1]][0] === 1) {
+        if (pawn[0] == 6) {
+          const allMoves = [];
+          if (arr[pawn[0] - 1][pawn[1]] === " ")
+            allMoves.push([pawn[0] - 1, pawn[1]]);
+          if (
+            arr[pawn[0] - 2][pawn[1]] === " " &&
+            arr[pawn[0] - 1][pawn[1]] === " "
+          )
+            allMoves.push([pawn[0] - 2, pawn[1]]);
+          if (
+            arr[pawn[0] - 1][pawn[1] + 1]?.[0] !== color &&
+            arr[pawn[0] - 1][pawn[1] + 1] !== " "
+          )
+            allMoves.push([pawn[0] - 1, pawn[1] + 1]);
+          if (
+            arr[pawn[0] - 1][pawn[1] - 1]?.[0] !== color &&
+            arr[pawn[0] - 1][pawn[1] - 1] !== " "
+          )
+            allMoves.push([pawn[0] - 1, pawn[1] - 1]);
+          return allMoves;
+        }
+        const allMoves = [];
+        if (arr[pawn[0] - 1][pawn[1]] === " ")
+          allMoves.push([pawn[0] - 1, pawn[1]]);
+        if (
+          arr[pawn[0] - 1][pawn[1] + 1]?.[0] !== color &&
+          arr[pawn[0] - 1][pawn[1] + 1] !== " "
+        )
+          allMoves.push([pawn[0] - 1, pawn[1] + 1]);
+        if (
+          arr[pawn[0] - 1][pawn[1] - 1]?.[0] !== color &&
+          arr[pawn[0] - 1][pawn[1] - 1] !== " "
+        )
+          allMoves.push([pawn[0] - 1, pawn[1] - 1]);
+        return allMoves;
+      }
+      if (pawn[0] == 1) {
+        const allMoves = [];
+        if (arr[pawn[0] + 1][pawn[1]] === " ")
+          allMoves.push([pawn[0] + 1, pawn[1]]);
+        if (
+          arr[pawn[0] + 2][pawn[1]] === " " &&
+          arr[pawn[0] + 1][pawn[1]] === " "
+        )
+          allMoves.push([pawn[0] + 2, pawn[1]]);
+        if (
+          arr[pawn[0] + 1][pawn[1] + 1]?.[0] !== color &&
+          arr[pawn[0] + 1][pawn[1] + 1] != " "
+        )
+          allMoves.push([pawn[0] + 1, pawn[1] + 1]);
+        if (
+          arr[pawn[0] + 1][pawn[1] - 1]?.[0] !== color &&
+          arr[pawn[0] + 1][pawn[1] - 1] != " "
+        )
+          allMoves.push([pawn[0] + 1, pawn[1] - 1]);
+        return allMoves;
+      }
+      const allMoves = [];
+      if (arr[pawn[0] + 1][pawn[1]] === " ")
+        allMoves.push([pawn[0] + 1, pawn[1]]);
+      if (
+        arr[pawn[0] + 1][pawn[1] + 1]?.[0] !== color &&
+        arr[pawn[0] + 1][pawn[1] + 1] != " "
+      )
+        allMoves.push([pawn[0] + 1, pawn[1] + 1]);
+      if (
+        arr[pawn[0] + 1][pawn[1] - 1]?.[0] !== color &&
+        arr[pawn[0] + 1][pawn[1] - 1] != " "
+      )
+        allMoves.push([pawn[0] + 1, pawn[1] - 1]);
+      return allMoves;
+    }
+
+    function calcKnightMoves(knight, horse) {
+      return [
+        [knight[0] + 1, knight[1] + 2],
+        [knight[0] + 1, knight[1] - 2],
+        [knight[0] + 2, knight[1] + 1],
+        [knight[0] + 2, knight[1] - 1],
+        [knight[0] - 1, knight[1] - 2],
+        [knight[0] - 1, knight[1] + 2],
+        [knight[0] - 2, knight[1] - 1],
+        [knight[0] - 2, knight[1] + 1],
+      ].filter((coord) => {
+        if (coord[0] < 8 && coord[0] >= 0 && coord[1] < 8 && coord[1] >= 0)
+          return true;
+      });
+    }
+    function calcKingMoves(king, arr, color) {
+      const checkRange = (a, b) =>
+        a >= 0 && a <= 8 && b >= 0 && b <= 8 ? true : false;
+      const allMoves = [];
+      // console.log(king, arr, color);
+      if (
+        arr?.[king[0] + 1]?.[king[1]]?.[0] !== color ||
+        arr?.[king[0] + 1]?.[king[1]] === " "
+      )
+        allMoves.push([king[0] + 1, king[1]]);
+      if (
+        arr?.[king[0] - 1]?.[king[1]]?.[0] !== color ||
+        arr?.[king[0] - 1]?.[king[1]] === " "
+      )
+        allMoves.push([king[0] - 1, king[1]]);
+      if (
+        arr?.[king[0]]?.[king[1] + 1]?.[0] !== color ||
+        arr?.[king[0]]?.[king[1] + 1] === " "
+      )
+        allMoves.push([king[0], king[1] + 1]);
+      if (
+        arr?.[king[0]]?.[king[1] - 1]?.[0] !== color ||
+        arr?.[king[0]]?.[king[1] - 1] === " "
+      )
+        allMoves.push([king[0], king[1] - 1]);
+      if (
+        arr?.[king[0] - 1]?.[king[1] - 1]?.[0] !== color ||
+        arr?.[king[0] - 1]?.[king[1] - 1] === " "
+      )
+        allMoves.push([king[0] - 1, king[1] - 1]);
+      if (
+        arr?.[king[0] + 1]?.[king[1] - 1]?.[0] !== color ||
+        arr?.[king[0] + 1]?.[king[1] - 1] === " "
+      )
+        allMoves.push([king[0] + 1, king[1] - 1]);
+      if (
+        arr?.[king[0] + 1]?.[king[1] + 1]?.[0] !== color ||
+        arr?.[king[0] + 1]?.[king[1] + 1] === " "
+      )
+        allMoves.push([king[0] + 1, king[1] + 1]);
+      if (
+        arr?.[king[0] - 1]?.[king[1] + 1]?.[0] !== color ||
+        arr?.[king[0] - 1]?.[king[1] + 1] === " "
+      )
+        allMoves.push([king[0] - 1, king[1] + 1]);
+      return allMoves;
+    }
+
+    const cells = document.querySelectorAll(".cell");
+    const board = document.querySelector(".board");
+    const move = document.querySelector(".moves");
+    let boardState = initialState;
+    let isWhite = true;
+    function update() {
+      axios
+        .post(sessionId, boardState)
+        .then(console.log("ok"))
+        .catch((er) => "not ok");
+    }
+    let selectedFig = "";
+    function run(e) {
+      const cell = e.target.closest(".cell");
+      if (cell.classList.contains("kill")) {
+        isWhite = !isWhite;
+        boardState = killFigure(
+          selectedFig,
+          boardState,
+          e.target.dataset.coords.split(","),
+          clear,
+          render,
+          updateWhoGoes,
+          cells,
+          move
+        );
+
+        updateWhoGoes(isWhite, move);
+        update();
+        return;
+      }
+      if (cell.classList.contains("hightlight")) {
+        isWhite = !isWhite;
+        boardState = moveFigure(
+          selectedFig,
+          boardState,
+          e.target.dataset.coords.split(","),
+          clear,
+          render,
+          updateWhoGoes,
+          cells,
+          move
+        );
+        updateWhoGoes(isWhite, move);
+        update();
+        return;
+      }
+
+      cells.forEach((cell) => cell.classList.remove("hightlight"));
+      cells.forEach((cell) => cell.classList.remove("kill"));
+      const element = cell.children[0];
+      if (!element) return;
+      const coords = element.dataset.coords.split(",").map((el) => +el);
+      const figure = [
+        element.classList[0] == "white" ? 0 : 1,
+        element.textContent,
+      ];
+      selectedFig = coords;
+      if ((figure[0] === 1 && isWhite) || (figure[0] === 0 && !isWhite)) return;
+      if (figure[1] === "♞") {
+        const moves = calcKnightMoves(coords);
+        const availableMoves = moves.filter((move) => {
+          if (
+            boardState[move[0]][move[1]] == " " ||
+            boardState[move[0]][move[1]][0] !== figure[0]
+          )
+            return true;
+        });
+        drawMoves(availableMoves, boardState, cells);
+      }
+      if (figure[1] === "♙") {
+        const moves = calcPawnMoves(coords, boardState, figure[0]);
+        drawMoves(moves, boardState, cells);
+      }
+      if (figure[1] === "♛") {
+        const moves = calcQueenMoves(coords, boardState, figure[0]);
+        drawMoves(moves, boardState, cells);
+      }
+      if (figure[1] === "♜") {
+        const moves = calcRookMoves(coords, boardState, figure[0]);
+        drawMoves(moves, boardState, cells);
+      }
+      if (figure[1] === "♝") {
+        const moves = calcBishopMoves(coords, boardState, figure[0]);
+        drawMoves(moves, boardState, cells);
+      }
+      if (figure[1] === "♔") {
+        const moves = calcKingMoves(coords, boardState, figure[0]);
+
+        const availableMoves = moves.filter((move) => {
+          if (
+            move[0] >= 0 &&
+            move[0] <= 7 &&
+            move[1] >= 0 &&
+            move[1] <= 7 &&
+            boardState?.[move[0]]?.[move[1]]?.[1] !== "♔" &&
+            distbetweenKings(move, boardState, figure[0])
+          )
+            return true;
+        });
+        drawMoves(availableMoves, boardState, cells);
+      }
+    }
+
+    function indexOpKing(arr, color) {
+      let indexOfOpKing;
+      arr.forEach((arr, y) => {
+        const x = arr.findIndex((el) => el[0] !== color && el[1] === "♔");
+
+        if (x >= 0) indexOfOpKing = [y, x];
+      });
+      return indexOfOpKing;
+    }
+
+    function distbetweenKings(king, arr, color) {
+      const opKing = indexOpKing(arr, color);
+
+      return (
+        Math.trunc(
+          Math.sqrt((king[0] - opKing[0]) ** 2 + (king[1] - opKing[1]) ** 2)
+        ) > 1
+      );
+    }
+
+    // TODO: write function that will return "true" if between kings are at least 2 units difference in coords
+    const linkForm = document.querySelector(".generate_link");
+    const send = document.querySelector("#send");
+    render(boardState, cells);
+    send.addEventListener("click", () => (linkForm.style.display = "none"));
+    board.addEventListener("click", run);
+    document
+      .querySelector(".generate_link button")
+      .addEventListener("click", (e) => {
+        axios.get("link").then((r) => {
+          const link = r.data.data;
+          document.querySelector("#link").value = link ;
+          send.style.display = "block";
+          sessionId = link.slice(0, -1) + "0";
+        });
+      });
+
+    updateWhoGoes(isWhite, move);
+    setInterval(() => {
+      if (sessionId) {
+        console.log(sessionId);
+        axios
+          .get(`${sessionId}`.slice(0, -1))
+          .then((r) => {
+
+            boardState = r.data.data;
+            console.log(sessionId);
+            clear(cells);
+            render(boardState, cells);
+          })
+          .catch((e) => console.log(e));
+      }
+    }, 2000);
+  </script>
+</html>

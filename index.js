@@ -9,6 +9,7 @@ import {
 } from "./modules/movesOfFigures.js";
 import { moveFigure, killFigure } from "./modules/module.js";
 import { updateWhoGoes, render, drawMoves, clear } from "./modules/view.js";
+import { getBoard } from "./modules/handleGetPostBoard.js";
 const cells = document.querySelectorAll(".cell");
 const board = document.querySelector(".board");
 const move = document.querySelector(".moves");
@@ -87,21 +88,44 @@ function run(e) {
   }
   if (figure[1] === "♔") {
     const moves = calcKingMoves(coords, boardState, figure[0]);
-    console.log(moves);
+
     const availableMoves = moves.filter((move) => {
       if (
         move[0] >= 0 &&
         move[0] <= 7 &&
         move[1] >= 0 &&
         move[1] <= 7 &&
-        boardState?.[move[0]]?.[move[1]]?.[1] !== "♔"
+        boardState?.[move[0]]?.[move[1]]?.[1] !== "♔" &&
+        distbetweenKings(move, boardState, figure[0])
       )
         return true;
     });
     drawMoves(availableMoves, boardState, cells);
   }
 }
+
+function indexOpKing(arr, color) {
+  let indexOfOpKing;
+  arr.forEach((arr, y) => {
+    const x = arr.findIndex((el) => el[0] !== color && el[1] === "♔");
+
+    if (x >= 0) indexOfOpKing = [y, x];
+  });
+  return indexOfOpKing;
+}
+
+function distbetweenKings(king, arr, color) {
+  const opKing = indexOpKing(arr, color);
+
+  return (
+    Math.trunc(
+      Math.sqrt((king[0] - opKing[0]) ** 2 + (king[1] - opKing[1]) ** 2)
+    ) > 1
+  );
+}
+
 // TODO: write function that will return "true" if between kings are at least 2 units difference in coords
 render(boardState, cells);
 board.addEventListener("click", run);
 updateWhoGoes(isWhite, move);
+getBoard().then((res) => console.log(res));

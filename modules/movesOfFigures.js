@@ -178,7 +178,6 @@ export function calcKnightMoves(knight, horse) {
 export function calcKingMoves(king, arr, color) {
   const checkRange = (a, b) =>
     a >= 0 && a <= 8 && b >= 0 && b <= 8 ? true : false;
-  console.log(king);
   const allMoves = [];
   // console.log(king, arr, color);
   if (
