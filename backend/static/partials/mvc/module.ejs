@@ -1,0 +1,57 @@
+function indexOpKing(arr, color) {
+    let indexOfOpKing;
+    arr.forEach((arr, y) => {
+      const x = arr.findIndex((el) => el[0] !== color && el[1] === "♔");
+
+      if (x >= 0) indexOfOpKing = [y, x];
+    });
+    return indexOfOpKing;
+  }
+
+  function distbetweenKings(king, arr, color) {
+    const opKing = indexOpKing(arr, color);
+
+    return (
+      Math.trunc(
+        Math.sqrt((king[0] - opKing[0]) ** 2 + (king[1] - opKing[1]) ** 2)
+      ) > 1
+    );
+  }
+  const copy = document.querySelector("#copy");
+  const linkForm = document.querySelector(".generate_link");
+  const send = document.querySelector("#send");
+  render(boardState, cells);
+  send.addEventListener("click", () => (linkForm.style.display = "none"));
+  board.addEventListener("click", run);
+  document
+    .querySelector(".generate_link button")
+    .addEventListener("click", (e) => {
+      axios.get(site+"link").then((r) => {
+        const link = r.data.data;
+        document.querySelector("#link").value = link ;
+        send.style.display = "block";
+        sessionId = link.slice(0, -1) + "0";
+      });
+    });
+    copy.addEventListener("click",() => {
+      const copyText = document.getElementById("link");
+      copyText.select();
+      document.execCommand("copy");
+    })
+  updateWhoGoes(isWhite, move);
+
+  setInterval(() => {
+    if (sessionId) {
+      axios
+        .get((`${sessionId}`.slice(0, -1)))
+        .then((r) => {
+          boardState = r.data.data.board;
+          isWhite = r.data.data.isWhite;
+          updateWhoGoes(isWhite, move)
+          console.log(sessionId);
+          clear(cells);
+          render(boardState, cells);
+        })
+        .catch((e) => console.log(e));
+    }
+  }, 2000);
