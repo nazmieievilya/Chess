@@ -48,10 +48,11 @@ function indexOpKing(arr, color) {
           boardState = r.data.data.board;
           isWhite = r.data.data.isWhite;
           updateWhoGoes(isWhite, move)
-          console.log(sessionId);
           clear(cells);
           render(boardState, cells);
         })
-        .catch((e) => console.log(e));
+        .catch((e) => {
+          window.location.href = "session_expired"
+          console.log(e)});
     }
   }, 2000);

@@ -2,7 +2,8 @@
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: sans-serif;
+    font-family: 'Roboto', sans-serif;
+    
   }
   body {
     
@@ -164,11 +165,11 @@
     /* display: none; */
   }
   .generate_link button {
-    margin-bottom: 15px;
+    margin-bottom: 6px;
     width: 200px;
     border: none;
-    
-    padding: 2px 12px;
+    background-color: white;
+    padding: 6px 12px;
     transition: 0.3s ease;
   }
   .generate_link button:hover {
@@ -178,31 +179,33 @@
   }
   .generate_link input {
     
+    background-color: white;
     border: none;
-    padding: 2px 12px;
+    padding: 6px 12px;
     padding-right: 0;
   }
   #send {
     display: flex;
     align-items: center;
-    margin-top: 40px;
+    margin-top: 14px;
     font-size: 12px;
     display: none;
     transform: all 0.2s ease;
+    padding: 6px 12px;
   }
   .loader {
     z-index: 9000;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: white;
+    background-color: rgb(254, 254, 254);
     width: 100%;
     height: 100%;
     position: absolute;
   }
   #copy {
-    width: 20px;
-    height: 20px;
+    width: 32px;
+    height: 28px;
     padding: 0;
     margin: 0;
     display: flex;
