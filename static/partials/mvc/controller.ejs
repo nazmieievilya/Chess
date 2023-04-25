@@ -1,0 +1,186 @@
+const cells = document.querySelectorAll(".cell");
+const board = document.querySelector(".board");
+const move = document.querySelector(".moves");
+let boardState = initialState;
+// let isWhite = true;////////////////////////////////
+<% if (isDark) { %>
+  let isWhite = false
+<% } else { %>
+  let isWhite = true
+<% } %>
+<% if (isDark) { %>
+  let boardFiguresD = true
+<% } else { %>
+  let boardFiguresD = false
+<% } %>
+function update() {
+  axios
+    .post(sessionId, {board:boardState, isWhite})
+    .then(console.log("ok"))
+    .catch((er) => "not ok");
+}
+let selectedFig = "";
+function run(e) {
+  console.log(boardFiguresD)
+  const cell = e.target.closest(".cell");
+  if (cell.classList.contains("kill")) {
+    isWhite = !isWhite;
+    boardState = killFigure(
+      selectedFig,
+      boardState,
+      e.target.dataset.coords.split(","),
+      clear,
+      render,
+      updateWhoGoes,
+      cells,
+      move
+    );
+
+    clearCheck();
+    <% if (isDark) { %>
+        if (kingIsInCheck(boardState, false)) showCheck();
+      <% } else { %>
+        if (kingIsInCheck(boardState, true)) showCheck();
+      <% } %>
+    updateWhoGoes(isWhite, move);
+    update();
+    return;
+  }
+  if (cell.classList.contains("hightlight")) {
+    isWhite = !isWhite;
+    boardState = moveFigure(
+      selectedFig,
+      boardState,
+      e.target.dataset.coords.split(","),
+      clear,
+      render,
+      updateWhoGoes,
+      cells,
+      move
+    );
+    clearCheck();
+    <% if (isDark) { %>
+        if (kingIsInCheck(boardState, false)) showCheck();
+      <% } else { %>
+        if (kingIsInCheck(boardState, true)) showCheck();
+      <% } %>
+    updateWhoGoes(isWhite, move);
+    update();
+    return;
+  }
+
+  cells.forEach((cell) => cell.classList.remove("hightlight"));
+  cells.forEach((cell) => cell.classList.remove("kill"));
+  const element = cell.children[0];
+  if (!element) return;
+  const coords = element.dataset.coords.split(",").map((el) => +el);
+  const figure = [
+    element.classList[0] == "white" ? 0 : 1,
+    element.textContent,
+  ];
+  selectedFig = coords;
+  if ((figure[0] === 1 && isWhite) || (figure[0] === 0 && !isWhite) ) return;
+  if ((figure[0] === 0 && boardFiguresD)  ) return;
+  if ((figure[0] === 1 && !boardFiguresD)  ) return;
+  if (figure[1] === "♞") {
+    const moves = calcKnightMoves(coords);
+    const availableMoves = moves.filter((move) => {
+      if (
+        boardState[move[0]][move[1]] == " " ||
+        boardState[move[0]][move[1]][0] !== figure[0]
+      )
+        return true;
+    });
+    drawMoves(availableMoves, boardState, cells);
+  }
+  if (figure[1] === "♙") {
+    const moves = calcPawnMoves(coords, boardState, figure[0]);
+    drawMoves(moves, boardState, cells);
+  }
+  if (figure[1] === "♛") {
+    const moves = calcQueenMoves(coords, boardState, figure[0]);
+    drawMoves(moves, boardState, cells);
+  }
+  if (figure[1] === "♜") {
+    const moves = calcRookMoves(coords, boardState, figure[0]);
+    drawMoves(moves, boardState, cells);
+  }
+  if (figure[1] === "♝") {
+    const moves = calcBishopMoves(coords, boardState, figure[0]);
+    drawMoves(moves, boardState, cells);
+  }
+  if (figure[1] === "♔") {
+    const moves = calcKingMoves(coords, boardState, figure[0]);
+
+    const availableMoves = moves.filter((move) => {
+      if (
+        move[0] >= 0 &&
+        move[0] <= 7 &&
+        move[1] >= 0 &&
+        move[1] <= 7 &&
+        boardState?.[move[0]]?.[move[1]]?.[1] !== "♔" &&
+        distbetweenKings(move, boardState, figure[0])
+      )
+        return true;
+    });
+    drawMoves(availableMoves, boardState, cells);
+  }
+}
+
+
+
+function kingIsInCheck(chessboard, isWhite) {
+  const opColor = isWhite ? 1 : 0;
+  const isCheck = [];
+  const opKing = chessboard
+    .map((arr, i) => {
+      const x = arr.findIndex(
+        (el) => (isWhite ? el[0] === 0 : el[0] == 1) && el[1] == "♔"
+      );
+      if (x >= 0) return [i, x];
+    })
+    .filter((el) => el)[0];
+
+  //
+  chessboard.forEach((arr, i) => {
+    arr.map((el, i2) => {
+      // check fot pawn
+      if (el[1] == "♙" && el[0] == opColor) {
+        const coords = calcPawnMoves([i, i2], chessboard, isWhite);
+        coords.forEach((coord) => {
+          if (coord[0] === opKing[0] && coord[1] === opKing[1])
+            isCheck.push(true);
+        });
+      }
+      if (el[1] == "♛" && el[0] == opColor) {
+        const coords = calcQueenMoves([i, i2], chessboard, isWhite);
+        coords.forEach((coord) => {
+          if (coord[0] === opKing[0] && coord[1] === opKing[1])
+            isCheck.push(true);
+        });
+      }
+      if (el[1] == "♜" && el[0] == opColor) {
+        const coords = calcRookMoves([i, i2], chessboard, isWhite);
+        coords.forEach((coord) => {
+          if (coord[0] === opKing[0] && coord[1] === opKing[1])
+            isCheck.push(true);
+        });
+      }
+      if (el[1] == "♝" && el[0] == opColor) {
+        const coords = calcBishopMoves([i, i2], chessboard, isWhite);
+        coords.forEach((coord) => {
+          if (coord[0] === opKing[0] && coord[1] === opKing[1])
+            isCheck.push(true);
+        });
+      }
+      if (el[1] == "♞" && el[0] == opColor) {
+        const coords = calcKnightMoves([i, i2], chessboard, isWhite);
+        coords.forEach((coord) => {
+          if (coord[0] === opKing[0] && coord[1] === opKing[1])
+            isCheck.push(true);
+        });
+      }
+    });
+  });
+  return isCheck.includes(true);
+}

@@ -1,0 +1,443 @@
+
+const tlLoader = gsap.timeline();
+const chooseFig = document.querySelector(".figures_container");
+const figuresForRep = document.querySelector(".chose_figure"); 
+const loader =  document.querySelector(".loader"); 
+const pace = document.querySelector(".pace-progress");
+// transform: translateY(-100%);
+paceOptions = {
+  restartOnRequestAfter: false
+}
+Pace.on("done", () => {
+  if(pace) pace.style.animation = "text-blur-out 0.2s cubic-bezier(0.550, 0.085, 0.680, 0.530) both";
+  loader.style.transform = "translateY(-100%)";
+});
+  <% if (isDark) { %>
+    let sessionId = <%= sessId %>
+  <% } else { %>
+    let sessionId
+  <% } %>
+  const site = "<%= site %>";
+  const initialState = [
+    [
+      [0, "♜"],
+      [0, "♞"],
+      [0, "♝"],
+      [0, "♛"],
+      [0, "♔"],
+      [0, "♝"],
+      [0, "♞"],
+      [0, "♜"],
+    ],
+    [
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+    ],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+    ],
+    [
+      [1, "♜"],
+      [1, "♞"],
+      [1, "♝"],
+      [1, "♛"],
+      [1, "♔"],
+      [1, "♝"],
+      [1, "♞"],
+      [1, "♜"],
+    ],
+  ];
+
+  function moveFigure(
+    figure,
+    arr,
+    coordsToMove,
+    clear,
+    render,
+    updateWhoGoes,
+    cells,
+    move
+  ) {
+    const newArr = JSON.parse(JSON.stringify(arr));
+    newArr[+coordsToMove[0]][+coordsToMove[1]] = newArr[figure[0]][figure[1]];
+    newArr[figure[0]][figure[1]] = " ";
+    newArr;
+    clear(cells);
+    render(newArr, cells);
+    cells.forEach((cell) => cell.classList.remove("hightlight"));
+    cells.forEach((cell) => cell.classList.remove("kill"));
+    const col = newArr[+coordsToMove[0]][+coordsToMove[1]][0] == 0 ? true : false;
+    if(newArr[+coordsToMove[0]][+coordsToMove[1]][1] === "♙" ) checkIsPawnOnOp([+coordsToMove[0],+coordsToMove[1]], col, newArr);
+    
+    return newArr;
+  }
+  function killFigure(
+    figure,
+    arr,
+    coordsToMove,
+    clear,
+    render,
+    updateWhoGoes,
+    cells,
+    move
+  ) {
+    const newArr = JSON.parse(JSON.stringify(arr));
+    newArr[+coordsToMove[0]][+coordsToMove[1]] = newArr[figure[0]][figure[1]];
+    newArr[figure[0]][figure[1]] = " ";
+
+    clear(cells);
+    render(newArr, cells);
+    cells.forEach((cell) => cell.classList.remove("hightlight"));
+    cells.forEach((cell) => cell.classList.remove("kill"));
+    const col = newArr[+coordsToMove[0]][+coordsToMove[1]][0] == 0 ? true : false
+    if(newArr[+coordsToMove[0]][+coordsToMove[1]][1] === "♙" ) checkIsPawnOnOp([+coordsToMove[0],+coordsToMove[1]], col, newArr);
+    return newArr;
+  }
+
+  function updateWhoGoes(isWhite, move) {
+    if (isWhite) return move.classList?.add("white");
+    move.classList?.remove("white");
+  }
+
+  const twoDamnArr = (arr, cells) =>
+    arr.map((_, i) => {
+      if (i > 7) return;
+      return [...cells].slice(i * 8, i * 8 + 8);
+    });
+  function render(arr, cells) {
+    const twoDemArr = twoDamnArr(arr, cells);
+    twoDemArr.forEach((row, x) => {
+      row.forEach((cell, y) => {
+        if (arr[x][y] == " ") return;
+        const color = arr[x][y][0];
+        const figure = arr[x][y][1];
+        cell.insertAdjacentHTML(
+          "afterbegin",
+          `<p data-coords='${x},${y}' class='${
+            color > 0 ? "balck" : "white"
+          } figure if_white'>${figure}</p>`
+        );
+      });
+    });
+  }
+function checkIsPawnOnOp(pawn, color, arr) {
+  function filterLessThanTwo(arr) {
+    const counts = {};
+    for (const elem of arr) {
+      counts[elem] = (counts[elem] || 0) + 1;
+    }
+    return arr.filter(elem => counts[elem] < 2);
+  }
+  const col = color ? 0 : 1;
+  const allFigures = ["♜", "♞", "♝", "♛"];
+  const figures = arr.flat().filter(el => el !== " " && el[0] == col && el[1] !== "♙" && el[1] !== "♔" ).map(el => el[1]);
+  let filtered = filterLessThanTwo(figures);
+  filtered.indexOf("♛") < 0 ? filtered.push("♛") : filtered = filtered.filter(f => f != "♛");
+  const lostFigures =  filtered;
+  console.log(lostFigures);
+  if(lostFigures.length === 0) return;
+  if(color && pawn[0] ===  7)  {
+    chooseFig.style.display = "flex";
+    lostFigures.forEach(f => figuresForRep.insertAdjacentHTML("afterbegin", `<p data-coords="${pawn[0]},${pawn[1]}" class="white figure">${f}</p>`))
+    
+  }
+  if(!color && pawn[0] ===  0)  {
+    chooseFig.style.display = "flex";
+    lostFigures.forEach(f => figuresForRep.insertAdjacentHTML("afterbegin", `<p data-coords="${pawn[0]},${pawn[1]}" class="black figure if_white">${f}</p>`))}
+  
+}
+function replaceFigure (e) {
+ const coords = e.target.dataset.coords.split(",");
+  // loop throught lost figures and insert into choose container with coords&colors
+  // remove choose continer
+  console.log(boardState);
+  boardState[coords[0]][coords[1]] = [e.target.classList.contains("white") ? 0 : 1, e.target.textContent]
+  update();
+  clear(cells);
+  render(boardState, cells);
+  chooseFig.style.display = "none";
+  
+}
+figuresForRep.addEventListener("click", replaceFigure)
+  function drawMoves(moves, arr, cells) {
+    const twoDemArr = twoDamnArr(arr, cells);
+    moves.forEach((move) => {
+      if (twoDemArr[move[0]][move[1]]?.textContent) {
+        twoDemArr[move[0]][move[1]].classList.add("kill");
+        twoDemArr[move[0]][move[1]].dataset.coords = [move[0], move[1]].join(
+          ","
+        );
+        return;
+      }
+      twoDemArr[move[0]][move[1]]?.classList.add("hightlight");
+      const dataset = twoDemArr[move[0]][move[1]]?.dataset;
+      dataset ? (dataset.coords = [move[0], move[1]].join(",")) : null;
+    });
+  }
+  function clear(cells) {
+    cells.forEach((cell) => {
+      cell.textContent = "";
+    });
+  }
+
+  function calcHor(figure, board, color) {
+    const arr = [];
+
+    for (let i = figure[0] + 1; i < 8; i++) {
+      if (board[i][figure[1]]?.[0] === color) break;
+      arr.push([i, figure[1]]);
+      if (board[i][figure[1]]?.[0] !== color && board[i][figure[1]] !== " ")
+        break;
+    }
+
+    // checking vertically backwards
+    for (let d = figure[0] - 1; d >= 0; d--) {
+      if (board[d][figure[1]]?.[0] === color) break;
+      arr.push([d, figure[1]]);
+      if (board[d][figure[1]]?.[0] !== color && board[d][figure[1]] !== " ")
+        break;
+    }
+
+    // checking to right
+    for (let r = figure[1] + 1; r < 8; r++) {
+      if (board[figure[0]][r]?.[0] === color) break;
+      arr.push([figure[0], r]);
+      if (board[figure[0]][r]?.[0] !== color && board[figure[0]][r] !== " ")
+        break;
+    }
+    for (let r = figure[1] - 1; r >= 0; r--) {
+      if (board[figure[0]][r]?.[0] === color) break;
+      arr.push([figure[0], r]);
+      if (board[figure[0]][r]?.[0] !== color && board[figure[0]][r] !== " ")
+        break;
+    }
+    return arr;
+  }
+
+  function calcDiag(figure, board, color) {
+    const arr = [];
+    for (let dr = figure[0] + 1; dr < 8; dr++) {
+      if (board[dr][figure[1] + dr - figure[0]]?.[0] === color) break;
+      arr.push([dr, figure[1] + dr - figure[0]]);
+      if (
+        board[dr][figure[1] + dr - figure[0]]?.[0] !== color &&
+        board[dr][figure[1] + dr - figure[0]] !== " "
+      )
+        break;
+    }
+    // from right-bottom to right-top
+    for (let dl = figure[0] - 1; dl >= 0; dl--) {
+      if (figure[1] - (figure[0] - dl) < 0) break;
+      if (board[dl][figure[1] - (figure[0] - dl)]?.[0] === color) break;
+      arr.push([dl, figure[1] - (figure[0] - dl)]);
+      if (
+        board[dl][figure[1] - (figure[0] - dl)]?.[0] !== color &&
+        board[dl][figure[1] - (figure[0] - dl)] !== " "
+      )
+        break;
+    }
+
+    // From right-top to left-bottom
+    for (let dlb = figure[0] + 1; dlb < 8; dlb++) {
+      if (figure[1] - (dlb - figure[0]) < 0) break;
+      if (board[dlb][figure[1] - (dlb - figure[0])]?.[0] === color) break;
+      arr.push([dlb, figure[1] - (dlb - figure[0])]);
+      if (
+        board[dlb][figure[1] - (dlb - figure[0])]?.[0] !== color &&
+        board[dlb][figure[1] - (dlb - figure[0])] !== " "
+      )
+        break;
+    }
+    // From left-bottom to right-top
+
+    for (let dlt = figure[0] - 1; dlt >= 0; dlt--) {
+      if (board[dlt][figure[1] + figure[0] - dlt]?.[0] === color) break;
+      arr.push([dlt, figure[1] + figure[0] - dlt]);
+      if (
+        board[dlt][figure[1] + figure[0] - dlt]?.[0] !== color &&
+        board[dlt][figure[1] + figure[0] - dlt] !== " "
+      )
+        break;
+    }
+    return arr;
+  }
+  function calcRookMoves(rook, board, color) {
+    return calcHor(rook, board, color);
+  }
+  function calcBishopMoves(bishop, board, color) {
+    return calcDiag(bishop, board, color);
+  }
+  function calcQueenMoves(queen, board, color) {
+    return [
+      ...calcDiag(queen, board, color),
+      ...calcHor(queen, board, color),
+    ];
+  }
+
+  function calcPawnMoves(pawn, arr, color) {
+    if (arr[pawn[0]][pawn[1]][0] === 1) {
+      if(pawn[0] === 0 ) return []
+      if (pawn[0] == 6) {
+        const allMoves = [];
+        if (arr[pawn[0] - 1][pawn[1]] === " ")
+          allMoves.push([pawn[0] - 1, pawn[1]]);
+        if (
+          arr[pawn[0] - 2][pawn[1]] === " " &&
+          arr[pawn[0] - 1][pawn[1]] === " "
+        )
+          allMoves.push([pawn[0] - 2, pawn[1]]);
+        if (
+          arr[pawn[0] - 1][pawn[1] + 1]?.[0] !== color &&
+          arr[pawn[0] - 1][pawn[1] + 1] !== " "
+        )
+          allMoves.push([pawn[0] - 1, pawn[1] + 1]);
+        if (
+          arr[pawn[0] - 1][pawn[1] - 1]?.[0] !== color &&
+          arr[pawn[0] - 1][pawn[1] - 1] !== " "
+        )
+          allMoves.push([pawn[0] - 1, pawn[1] - 1]);
+        return allMoves;
+      }
+      const allMoves = [];
+      if (arr[pawn[0] - 1][pawn[1]] === " ")
+        allMoves.push([pawn[0] - 1, pawn[1]]);
+      if (
+        arr[pawn[0] - 1][pawn[1] + 1]?.[0] !== color &&
+        arr[pawn[0] - 1][pawn[1] + 1] !== " "
+      )
+        allMoves.push([pawn[0] - 1, pawn[1] + 1]);
+      if (
+        arr[pawn[0] - 1][pawn[1] - 1]?.[0] !== color &&
+        arr[pawn[0] - 1][pawn[1] - 1] !== " "
+      )
+        allMoves.push([pawn[0] - 1, pawn[1] - 1]);
+      return allMoves;
+    }
+    if(pawn[0] === 7 ) return []
+    if (pawn[0] == 1) {
+      const allMoves = [];
+      if (arr[pawn[0] + 1][pawn[1]] === " ")
+        allMoves.push([pawn[0] + 1, pawn[1]]);
+      if (
+        arr[pawn[0] + 2][pawn[1]] === " " &&
+        arr[pawn[0] + 1][pawn[1]] === " "
+      )
+        allMoves.push([pawn[0] + 2, pawn[1]]);
+      if (
+        arr[pawn[0] + 1][pawn[1] + 1]?.[0] !== color &&
+        arr[pawn[0] + 1][pawn[1] + 1] != " "
+      )
+        allMoves.push([pawn[0] + 1, pawn[1] + 1]);
+      if (
+        arr[pawn[0] + 1][pawn[1] - 1]?.[0] !== color &&
+        arr[pawn[0] + 1][pawn[1] - 1] != " "
+      )
+        allMoves.push([pawn[0] + 1, pawn[1] - 1]);
+      return allMoves;
+    }
+    const allMoves = [];
+    if (arr[pawn[0] + 1][pawn[1]] === " ")
+      allMoves.push([pawn[0] + 1, pawn[1]]);
+    if (
+      arr[pawn[0] + 1][pawn[1] + 1]?.[0] !== color &&
+      arr[pawn[0] + 1][pawn[1] + 1] != " "
+    )
+      allMoves.push([pawn[0] + 1, pawn[1] + 1]);
+    if (
+      arr[pawn[0] + 1][pawn[1] - 1]?.[0] !== color &&
+      arr[pawn[0] + 1][pawn[1] - 1] != " "
+    )
+      allMoves.push([pawn[0] + 1, pawn[1] - 1]);
+    return allMoves;
+  }
+
+  function calcKnightMoves(knight, horse) {
+    return [
+      [knight[0] + 1, knight[1] + 2],
+      [knight[0] + 1, knight[1] - 2],
+      [knight[0] + 2, knight[1] + 1],
+      [knight[0] + 2, knight[1] - 1],
+      [knight[0] - 1, knight[1] - 2],
+      [knight[0] - 1, knight[1] + 2],
+      [knight[0] - 2, knight[1] - 1],
+      [knight[0] - 2, knight[1] + 1],
+    ].filter((coord) => {
+      if (coord[0] < 8 && coord[0] >= 0 && coord[1] < 8 && coord[1] >= 0)
+        return true;
+    });
+  }
+  function calcKingMoves(king, arr, color) {
+    const checkRange = (a, b) =>
+      a >= 0 && a <= 8 && b >= 0 && b <= 8 ? true : false;
+    const allMoves = [];
+    // console.log(king, arr, color);
+    if (
+      arr?.[king[0] + 1]?.[king[1]]?.[0] !== color ||
+      arr?.[king[0] + 1]?.[king[1]] === " "
+    )
+      allMoves.push([king[0] + 1, king[1]]);
+    if (
+      arr?.[king[0] - 1]?.[king[1]]?.[0] !== color ||
+      arr?.[king[0] - 1]?.[king[1]] === " "
+    )
+      allMoves.push([king[0] - 1, king[1]]);
+    if (
+      arr?.[king[0]]?.[king[1] + 1]?.[0] !== color ||
+      arr?.[king[0]]?.[king[1] + 1] === " "
+    )
+      allMoves.push([king[0], king[1] + 1]);
+    if (
+      arr?.[king[0]]?.[king[1] - 1]?.[0] !== color ||
+      arr?.[king[0]]?.[king[1] - 1] === " "
+    )
+      allMoves.push([king[0], king[1] - 1]);
+    if (
+      arr?.[king[0] - 1]?.[king[1] - 1]?.[0] !== color ||
+      arr?.[king[0] - 1]?.[king[1] - 1] === " "
+    )
+      allMoves.push([king[0] - 1, king[1] - 1]);
+    if (
+      arr?.[king[0] + 1]?.[king[1] - 1]?.[0] !== color ||
+      arr?.[king[0] + 1]?.[king[1] - 1] === " "
+    )
+      allMoves.push([king[0] + 1, king[1] - 1]);
+    if (
+      arr?.[king[0] + 1]?.[king[1] + 1]?.[0] !== color ||
+      arr?.[king[0] + 1]?.[king[1] + 1] === " "
+    )
+      allMoves.push([king[0] + 1, king[1] + 1]);
+    if (
+      arr?.[king[0] - 1]?.[king[1] + 1]?.[0] !== color ||
+      arr?.[king[0] - 1]?.[king[1] + 1] === " "
+    )
+      allMoves.push([king[0] - 1, king[1] + 1]);
+    return allMoves;
+  }
+  const checkPop = document.querySelector(".check");
+  const background = document.querySelector("body");
+  function showCheck() {
+    background.style.backgroundColor = "#995252";
+    checkPop.style.display = "flex";
+    setTimeout(() => {checkPop.style.display = "none";},2000)
+  }
+  function clearCheck() {
+    background.style.backgroundColor = "#1b1b1b";
+    checkPop.style.display = "none";
+  }

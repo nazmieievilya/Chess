@@ -1,0 +1,81 @@
+function indexOpKing(arr, color) {
+    let indexOfOpKing;
+    arr.forEach((arr, y) => {
+      const x = arr.findIndex((el) => el[0] !== color && el[1] === "♔");
+
+      if (x >= 0) indexOfOpKing = [y, x];
+    });
+    return indexOfOpKing;
+  }
+
+  function distbetweenKings(king, arr, color) {
+    const opKing = indexOpKing(arr, color);
+
+    return (
+      Math.trunc(
+        Math.sqrt((king[0] - opKing[0]) ** 2 + (king[1] - opKing[1]) ** 2)
+      ) > 1
+    );
+  }
+  const copy = document.querySelector("#copy");
+  const linkForm = document.querySelector(".generate_link");
+  const send = document.querySelector("#send");
+  render(boardState, cells);
+  send.addEventListener("click", () => {
+    linkForm.style.display = "none";
+    document.querySelector("video").remove();
+  });
+  board.addEventListener("click", run);
+  document
+    .querySelector(".generate_link button")
+    .addEventListener("click", (e) => {
+      axios.get(site+"link").then((r) => {
+        const link = r.data.data;
+        document.querySelector("#link").value = link ;
+        send.style.transform = "translateY(0)";
+        send.style.opacity = 1;
+       
+        sessionId = link.slice(0, -1) + "0";
+      });
+    });
+    copy.addEventListener("click",() => {
+      const copyText = document.getElementById("link");
+      copyText.select();
+      document.execCommand("copy");
+    })
+  updateWhoGoes(isWhite, move);
+  let lastCheck = false
+  setInterval(() => {
+    if (sessionId) {
+      axios
+        .get((`${sessionId}`.slice(0, -1)))
+        .then((r) => {
+          const newState = r.data.data.board;
+          
+          
+          
+          // set "true" from white, "false" frot black
+          if(JSON.stringify(boardState) != JSON.stringify(newState)) {
+            isWhite = r.data.data.isWhite;
+            boardState = newState;
+            updateWhoGoes(isWhite, move)
+            clear(cells);
+            render(boardState, cells);
+            <% if (isDark) { %>
+              if (kingIsInCheck(boardState, false)) { 
+                clearCheck();
+                showCheck();};
+            <% } else { %>
+              if (kingIsInCheck(boardState, true)) { 
+                clearCheck();
+                showCheck();}
+            <% } %>
+          }
+          
+
+        })
+        .catch((e) => {
+          window.location.href = "session_expired" ;
+          console.log(e)});
+    }
+  }, 2000);

@@ -1,131 +1,177 @@
-import { initialState } from "./constants.js";
-import {
-  calcRookMoves,
-  calcBishopMoves,
-  calcQueenMoves,
-  calcPawnMoves,
-  calcKnightMoves,
-  calcKingMoves,
-} from "./modules/movesOfFigures.js";
-import { moveFigure, killFigure } from "./modules/module.js";
-import { updateWhoGoes, render, drawMoves, clear } from "./modules/view.js";
-import { getBoard } from "./modules/handleGetPostBoard.js";
-const cells = document.querySelectorAll(".cell");
-const board = document.querySelector(".board");
-const move = document.querySelector(".moves");
-let boardState = initialState;
-let isWhite = true;
+const axios = require("axios");
+const express = require("express");
+const { request, response } = require("express");
+const fs = require("fs");
+const path = require("path");
+const stream = require("stream");
 
-let selectedFig = "";
-function run(e) {
-  const cell = e.target.closest(".cell");
-  if (cell.classList.contains("kill")) {
-    isWhite = !isWhite;
-    boardState = killFigure(
-      selectedFig,
-      boardState,
-      e.target.dataset.coords.split(","),
-      clear,
-      render,
-      updateWhoGoes,
-      cells,
-      move
-    );
+try {
+  const site = "https://chess-6p0b.onrender.com/";
+  // const site = "http://127.0.0.1:3000/";
 
-    updateWhoGoes(isWhite, move);
-    return;
-  }
-  if (cell.classList.contains("hightlight")) {
-    isWhite = !isWhite;
-    boardState = moveFigure(
-      selectedFig,
-      boardState,
-      e.target.dataset.coords.split(","),
-      clear,
-      render,
-      updateWhoGoes,
-      cells,
-      move
-    );
-    updateWhoGoes(isWhite, move);
-    return;
-  }
+  let initialState = [
+    [
+      [0, "♜"],
+      [0, "♞"],
+      [0, "♝"],
+      [0, "♛"],
+      [0, "♔"],
+      [0, "♝"],
+      [0, "♞"],
+      [0, "♜"],
+    ],
+    [
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+      [0, "♙"],
+    ],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [" ", " ", " ", " ", " ", " ", " ", " "],
+    [
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+      [1, "♙"],
+    ],
+    [
+      [1, "♜"],
+      [1, "♞"],
+      [1, "♝"],
+      [1, "♛"],
+      [1, "♔"],
+      [1, "♝"],
+      [1, "♞"],
+      [1, "♜"],
+    ],
+  ];
+  let sessions = [];
+  const app = express();
+  app.set("views", __dirname + "/static");
+  app.set("view engine", "ejs"); // set the view engine to ejs
+  app.use(express.static("public"));
+  app.use(express.json());
+  app.locals.axios = axios;
+  const getBoard = (request, response) => {
+    const id = request.params.id;
 
-  cells.forEach((cell) => cell.classList.remove("hightlight"));
-  cells.forEach((cell) => cell.classList.remove("kill"));
-  const element = cell.children[0];
-  if (!element) return;
-  const coords = element.dataset.coords.split(",").map((el) => +el);
-  const figure = [element.classList[0] == "white" ? 0 : 1, element.textContent];
-  selectedFig = coords;
-  if ((figure[0] === 1 && isWhite) || (figure[0] === 0 && !isWhite)) return;
-  if (figure[1] === "♞") {
-    const moves = calcKnightMoves(coords);
-    const availableMoves = moves.filter((move) => {
-      if (
-        boardState[move[0]][move[1]] == " " ||
-        boardState[move[0]][move[1]][0] !== figure[0]
-      )
-        return true;
+    const color = id[id.length - 1];
+
+    if (color === "1" && id.length === 5) {
+      const data = {
+        isDark: true,
+        sessId: id,
+        site: site,
+      };
+      return response.render("index_page", data);
+    }
+    if (id.length === 4) {
+      const session = sessions.find((el) => +el.id == id);
+
+      if (session == undefined)
+        return response.status(404).json({
+          status: "not found",
+        });
+      return response.status(200).json({
+        status: "success",
+        data: { board: session.board, isWhite: session.isWhite },
+      });
+    }
+  };
+  const updateBoard = (request, response) => {
+    const id = request.params.id;
+    const color = id[id.length - 1];
+    const session = sessions.find((el) => +el.id == id.slice(0, -1));
+    session.board = request.body.board;
+    session.isWhite = request.body.isWhite;
+    (session.time = Date.now()),
+      response.status(200).json({
+        status: "success",
+        data: "ok",
+      });
+  };
+  const sesExp = (request, response) => {
+    const data = {
+      link: site,
+    };
+    return response.render("session_expired", data);
+  };
+  const sendLink = (request, response) => {
+    const sessionId = `${Math.random()}`.slice(2, 6);
+    sessions.push({
+      id: sessionId,
+      board: initialState,
+      isWhite: true,
+      time: Date.now(),
     });
-    drawMoves(availableMoves, boardState, cells);
-  }
-  if (figure[1] === "♙") {
-    const moves = calcPawnMoves(coords, boardState, figure[0]);
-    drawMoves(moves, boardState, cells);
-  }
-  if (figure[1] === "♛") {
-    const moves = calcQueenMoves(coords, boardState, figure[0]);
-    drawMoves(moves, boardState, cells);
-  }
-  if (figure[1] === "♜") {
-    const moves = calcRookMoves(coords, boardState, figure[0]);
-    drawMoves(moves, boardState, cells);
-  }
-  if (figure[1] === "♝") {
-    const moves = calcBishopMoves(coords, boardState, figure[0]);
-    drawMoves(moves, boardState, cells);
-  }
-  if (figure[1] === "♔") {
-    const moves = calcKingMoves(coords, boardState, figure[0]);
-
-    const availableMoves = moves.filter((move) => {
-      if (
-        move[0] >= 0 &&
-        move[0] <= 7 &&
-        move[1] >= 0 &&
-        move[1] <= 7 &&
-        boardState?.[move[0]]?.[move[1]]?.[1] !== "♔" &&
-        distbetweenKings(move, boardState, figure[0])
-      )
-        return true;
+    response.status(200).json({
+      status: "succes",
+      data: site + sessionId + "1",
     });
-    drawMoves(availableMoves, boardState, cells);
-  }
-}
+  };
 
-function indexOpKing(arr, color) {
-  let indexOfOpKing;
-  arr.forEach((arr, y) => {
-    const x = arr.findIndex((el) => el[0] !== color && el[1] === "♔");
-
-    if (x >= 0) indexOfOpKing = [y, x];
+  app.get("/", function (req, res) {
+    const data = {
+      isDark: false,
+      site: site,
+    };
+    res.render("index_page", data);
   });
-  return indexOfOpKing;
+  app.get("/link", sendLink);
+  app.get("/session_expired", sesExp);
+  app.get("/:id", getBoard);
+  app.post("/:id", updateBoard);
+  app.get("/image", (req, res) => {
+    const r = fs.createReadStream(__dirname + "/chess.png"); // or any other way to get a readable stream
+    const ps = new stream.PassThrough(); // <---- this makes a trick with stream error handling
+    stream.pipeline(
+      r,
+      ps, // <---- this makes a trick with stream error handling
+      (err) => {
+        if (err) {
+          console.log(err); // No such file or any other kind of error
+          return res.sendStatus(400);
+        }
+      }
+    );
+    ps.pipe(res); // <---- this makes a trick with stream error handling
+  });
+
+  const port = 3000;
+
+  app.listen(port, () => {
+    console.log(`App running on port ${port}`);
+  });
+  setInterval(() => {
+    if (sessions.length === 0) return;
+    sessions.forEach((sess) => {
+      const timePass = (Date.now() - sess?.time) / 1000;
+      if (timePass > 300) sessions = sessions.filter((s) => s.id !== sess.id);
+    });
+  }, 5000);
+
+  function randomInRange(from, to) {
+    var r = Math.random();
+    return Math.floor(r * (to - from) + from);
+  }
+  setInterval(() => {
+    axios
+      .get(site)
+      .then((res) => res)
+      .catch((e) => console.log(e));
+  }, 399999 + randomInRange(-500, 500));
+} catch (e) {
+  console.log(e);
 }
 
-function distbetweenKings(king, arr, color) {
-  const opKing = indexOpKing(arr, color);
-
-  return (
-    Math.trunc(
-      Math.sqrt((king[0] - opKing[0]) ** 2 + (king[1] - opKing[1]) ** 2)
-    ) > 1
-  );
-}
-
-// TODO: write function that will return "true" if between kings are at least 2 units difference in coords
-render(boardState, cells);
-board.addEventListener("click", run);
-updateWhoGoes(isWhite, move);
-getBoard().then((res) => console.log(res));
+// ONLY ON PRODUCTION
