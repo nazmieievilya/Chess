@@ -140,8 +140,7 @@ function kingIsInCheck(chessboard, isWhite) {
       if (x >= 0) return [i, x];
     })
     .filter((el) => el)[0];
-
-  //
+  if(!opKing) return;
   chessboard.forEach((arr, i) => {
     arr.map((el, i2) => {
       // check fot pawn

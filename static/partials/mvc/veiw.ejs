@@ -88,6 +88,24 @@ Pace.on("done", () => {
     
     return newArr;
   }
+
+  function checkCheck(arr) {
+    const isSuchElementInArr = (arr, target) => {
+      for (let i = 0; i < arr.length; i++) {
+        for (let j = 0; j < arr[i].length; j++) {
+          if (arr[i][j][0] === target[0] && arr[i][j][1] === target[1]) {
+            return true; // target element found in array
+          }
+        }
+      }
+      return false; // target element not found in array
+    }
+    const isWhiteExist = isSuchElementInArr(arr, [0,"♔"]);
+    const isBlackExist = isSuchElementInArr(arr, [1,"♔"]);
+    //TODO: add popup depending who win and lose according to isWhite/isBlack results to each player
+    console.log(isWhiteExist, isBlackExist, isWhite);
+  }
+
   function killFigure(
     figure,
     arr,
@@ -108,6 +126,7 @@ Pace.on("done", () => {
     cells.forEach((cell) => cell.classList.remove("kill"));
     const col = newArr[+coordsToMove[0]][+coordsToMove[1]][0] == 0 ? true : false
     if(newArr[+coordsToMove[0]][+coordsToMove[1]][1] === "♙" ) checkIsPawnOnOp([+coordsToMove[0],+coordsToMove[1]], col, newArr);
+    checkCheck(newArr)
     return newArr;
   }
 
