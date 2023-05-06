@@ -58,6 +58,8 @@ function indexOpKing(arr, color) {
           if(JSON.stringify(boardState) != JSON.stringify(newState)) {
             isWhite = r.data.data.isWhite;
             boardState = newState;
+            // if any king desapears call checkCheck
+            if(!(isSuchElementInArr(boardState, [0,"♔"]) && isSuchElementInArr(boardState, [1,"♔"]))) checkCheck(boardState);
             updateWhoGoes(isWhite, move)
             clear(cells);
             render(boardState, cells);

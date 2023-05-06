@@ -3,6 +3,8 @@ const tlLoader = gsap.timeline();
 const chooseFig = document.querySelector(".figures_container");
 const figuresForRep = document.querySelector(".chose_figure"); 
 const loader =  document.querySelector(".loader"); 
+const winlose = document.querySelector(".win_lose");
+const winloseText = document.querySelector(".win_lose h2");
 const pace = document.querySelector(".pace-progress");
 // transform: translateY(-100%);
 paceOptions = {
@@ -88,22 +90,30 @@ Pace.on("done", () => {
     
     return newArr;
   }
-
-  function checkCheck(arr) {
-    const isSuchElementInArr = (arr, target) => {
-      for (let i = 0; i < arr.length; i++) {
-        for (let j = 0; j < arr[i].length; j++) {
-          if (arr[i][j][0] === target[0] && arr[i][j][1] === target[1]) {
-            return true; // target element found in array
-          }
+  function showWinLose(isWin) {
+    winlose.style.zIndex = "3000";
+    winlose.style.opacity = "1.2";
+    winloseText.style.color = isWin ? "#2e7c51" : "#9a4848";
+    winloseText.textContent = isWin ?"You Win!🎉" : "You Lose!🤯🔫"
+  }
+  function isSuchElementInArr(arr, target) {
+    for (let i = 0; i < arr.length; i++) {
+      for (let j = 0; j < arr[i].length; j++) {
+        if (arr[i][j][0] === target[0] && arr[i][j][1] === target[1]) {
+          return true; // target element found in array
         }
       }
-      return false; // target element not found in array
     }
+    return false; // target element not found in array
+  }
+  function checkCheck(arr) {
+    
     const isWhiteExist = isSuchElementInArr(arr, [0,"♔"]);
     const isBlackExist = isSuchElementInArr(arr, [1,"♔"]);
-    //TODO: add popup depending who win and lose according to isWhite/isBlack results to each player
-    console.log(isWhiteExist, isBlackExist, isWhite);
+    if(isWhiteExist && isBlackExist) return;
+    console.log("Твой цв: " + isWhite);
+    if(!boardFiguresD) return showWinLose(!isBlackExist);
+    if(boardFiguresD) showWinLose(!isWhiteExist);
   }
 
   function killFigure(
@@ -182,7 +192,7 @@ function checkIsPawnOnOp(pawn, color, arr) {
     lostFigures.forEach(f => figuresForRep.insertAdjacentHTML("afterbegin", `<p data-coords="${pawn[0]},${pawn[1]}" class="black figure if_white">${f}</p>`))}
   
 }
-function replaceFigure (e) {
+function replaceFigure(e) {
  const coords = e.target.dataset.coords.split(",");
   // loop throught lost figures and insert into choose container with coords&colors
   // remove choose continer
